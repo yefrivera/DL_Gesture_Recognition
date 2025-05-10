@@ -9,7 +9,7 @@ hands = mp_hands.Hands(static_image_mode=False, max_num_hands=1, min_detection_c
 mp_drawing = mp.solutions.drawing_utils
 
 DATA_PATH = 'dataset/keypoints_csv'
-GESTURES = ['saludo', 'stop', 'cerrar_puno']  # Ejemplo
+GESTURES = ['pellizco', 'pulgar_afuera', 'puño_cerrado']  # Ejemplo
 
 SEQUENCE_LENGTH = 30
 
@@ -34,13 +34,13 @@ def process_video(video_path, label, output_file):
         if len(sequence) == SEQUENCE_LENGTH:
             with open(output_file, mode='a', newline='') as f:
                 writer = csv.writer(f)
-                writer.writerow(np.concatenate([keypoints for keypoints in sequence] + [label]))
+                writer.writerow(np.concatenate(sequence + [np.array([label])]))
             sequence.pop(0)
     cap.release()
 
 # Ejemplo: procesar todos los videos de un gesto
 for gesture in GESTURES:
-    gesture_folder = f'dataset/raw_videos/{gesture}'
+    gesture_folder = f'dataset/videos_for_training/{gesture}'
     for video in os.listdir(gesture_folder):
         process_video(os.path.join(gesture_folder, video), GESTURES.index(gesture),
                       f'{DATA_PATH}/{gesture}.csv')
